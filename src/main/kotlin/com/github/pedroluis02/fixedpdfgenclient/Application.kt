@@ -1,5 +1,6 @@
 package com.github.pedroluis02.fixedpdfgenclient
 
+import com.github.pedroluis02.fixedpdfgenclient.service.PdfGenerationService
 import com.github.pedroluis02.fixedpdfgenclient.service.ServerInfoService
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -22,9 +23,18 @@ suspend fun main() {
         }
     }
 
+    downloadPdfSample(client)
+    client.close()
+}
+
+private suspend fun getServerInfo(client: HttpClient) {
     val service = ServerInfoService(client)
     val info = service.getInfo()
     println(info)
+}
 
-    client.close()
+private suspend fun downloadPdfSample(client: HttpClient) {
+    val service = PdfGenerationService(client)
+    val file = service.downloadSample()
+    println("file: $file")
 }

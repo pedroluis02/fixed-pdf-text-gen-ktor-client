@@ -8,13 +8,19 @@ import java.io.File
 
 class PdfGenerationService(private val client: HttpClient) {
 
-    suspend fun downloadSample(): File {
+    suspend fun downloadSample(): File? {
         val response = client.post("pdf-generation/sample")
+        return createFile(response)
+    }
 
+    private suspend fun createFile(response: HttpResponse): File? {
         val contentDispositionValue = response.headers[HttpHeaders.ContentDisposition]
-        val contentDisposition = ContentDisposition.parse(contentDispositionValue!!)
+            ?: return null
 
-        val name = contentDisposition.parameter(ContentDisposition.Parameters.FileName)!!
+        val contentDisposition = ContentDisposition.parse(contentDispositionValue)
+
+        val name = contentDisposition.parameter(ContentDisposition.Parameters.FileName)
+            ?: return null
         val file = File(name)
 
         val output = response.bodyAsBytes()

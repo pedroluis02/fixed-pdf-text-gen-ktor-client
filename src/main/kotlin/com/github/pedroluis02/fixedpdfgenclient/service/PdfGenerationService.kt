@@ -13,6 +13,14 @@ class PdfGenerationService(private val client: HttpClient) {
         return createFile(response)
     }
 
+    suspend fun downloadFromTemplate(json: String): File? {
+        val response = client.post("pdf-generation/template") {
+            contentType(ContentType.Application.Json)
+            setBody(json)
+        }
+        return createFile(response)
+    }
+
     private suspend fun createFile(response: HttpResponse): File? {
         val contentDispositionValue = response.headers[HttpHeaders.ContentDisposition]
             ?: return null

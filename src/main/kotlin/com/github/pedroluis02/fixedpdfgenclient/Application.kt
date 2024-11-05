@@ -8,6 +8,8 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
+import java.nio.file.Files
+import java.nio.file.Path
 
 suspend fun main() {
     val client = HttpClient(CIO) {
@@ -23,7 +25,7 @@ suspend fun main() {
         }
     }
 
-    downloadPdfSample(client)
+    downloadPdfFromTemplate(client)
     client.close()
 }
 
@@ -36,5 +38,17 @@ private suspend fun getServerInfo(client: HttpClient) {
 private suspend fun downloadPdfSample(client: HttpClient) {
     val service = PdfGenerationService(client)
     val file = service.downloadSample()
-    println("file: $file")
+    println("sample file: $file")
+}
+
+private suspend fun downloadPdfFromTemplate(client: HttpClient) {
+    val templateJson = readTemplateJson()
+
+    val service = PdfGenerationService(client)
+    val file = service.downloadFromTemplate(templateJson)
+    println("template file: $file")
+}
+
+private fun readTemplateJson(): String {
+    return Files.readString(Path.of("pdf-template.json"))
 }
